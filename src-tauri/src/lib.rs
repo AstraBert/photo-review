@@ -31,7 +31,8 @@ fn save_api_key(key_name: String, api_key: String) -> Result<(), String> {
 #[tauri::command]
 fn get_api_key(key_name: String) -> Result<String, String> {
     let entry = Entry::new(SERVICE_NAME, &key_name).map_err(|e| e.to_string())?;
-    entry.get_password().map_err(|e| e.to_string())
+    let psw = entry.get_password().map_err(|e| e.to_string())?;
+    Ok(psw)
 }
 
 #[tauri::command]
