@@ -6,7 +6,6 @@ import "./App.css";
 const API_KEY_NAME = "openai";
 
 const SCORE_FIELDS: { key: keyof PhotoReview; label: string }[] = [
-  { key: "overall", label: "Overall" },
   { key: "sharpness_focus", label: "Sharpness & Focus" },
   { key: "exposure", label: "Exposure" },
   { key: "noise", label: "Noise" },
@@ -138,9 +137,9 @@ function BboxOverlay({
   return (
     <>
       {bboxes.map((bbox, i) => {
-        // Backend coords: origin at bottom-right, x increases left, y increases up
-        const cssLeft = (imgWidth - (bbox.x + bbox.width)) * scaleX;
-        const cssTop = (imgHeight - (bbox.y + bbox.height)) * scaleY;
+        // Standard image coords: origin at top-left, x right, y down (same as CSS)
+        const cssLeft = bbox.x * scaleX;
+        const cssTop = bbox.y * scaleY;
         const cssWidth = bbox.width * scaleX;
         const cssHeight = bbox.height * scaleY;
 

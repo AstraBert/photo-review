@@ -16,7 +16,7 @@ Scoring guidelines:
 
 Bounding boxes:
 - Provide at most 5 bboxes, only for the most impactful specific issues or highlights worth pointing out.
-- Coordinates (x, y, width, height) are in pixels, relative to the image's actual width and height. x increases from right to left; y increases from bottom to top.
+- Coordinates (x, y, width, height) are in pixels, relative to the image's actual width and height. The origin (0, 0) is the top-left corner. x increases left to right; y increases top to bottom.
 - Each bbox's text should be a short, actionable note tied to that specific region.
 "#;
 const LLM_MODEL: &str = "gpt-5.4-mini";
@@ -57,13 +57,13 @@ pub struct ScoreAndExplanation {
 /// with an associated text representing
 /// the critique/suggestion for that part
 pub struct Bbox {
-    /// x origin for the bbox. x should start from
-    /// the right and go towards left with positive
-    /// coordinates
+    /// x origin for the bbox (top-left corner).
+    /// x starts at 0 on the left edge and increases
+    /// to the right.
     x: f32,
-    /// y origin for the bbox. y should start from
-    /// the bottom and go up to the top with positive
-    /// coordinates
+    /// y origin for the bbox (top-left corner).
+    /// y starts at 0 on the top edge and increases
+    /// downward.
     y: f32,
     width: f32,
     height: f32,
