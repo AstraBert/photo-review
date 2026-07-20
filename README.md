@@ -28,6 +28,17 @@ xattr -cr /Applications/photo-review.app
 
 You will be prompted to approve the app to access you Mac's keychain, which is required to securely store your OpenAI API key.
 
+**Windows**
+
+> [!NOTE]
+> The application is compiled only for Windows x86_64 (AMD arch). Newer ARM64 architectures are not supported.
+
+The system might attempt to block the installation: in that case, you should click on **Advanced options** on the dialog that pops up, and then on **install anyways**.
+
+While the installation wizard works, you might still be presented with a dialog asking you if you want the wizard to apply changes to your system: the changes simply consist of the installation of the app, so you can click "Yes" if you actually want to proceed.
+
+From there, Windows should leave you alone.
+
 ---
 
 ## Features
