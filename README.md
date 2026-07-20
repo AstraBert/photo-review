@@ -6,6 +6,30 @@ Built with **Tauri v2** (Rust backend) + **React + TypeScript** (Vite frontend).
 
 ---
 
+## Installation
+
+Install the application from the [dedicated website](https://astrabert.github.io/photo-review/) or from the [GitHub Releases Page](https://github.com/AstraBert/photo-review/releases/).
+
+> [!NOTE]
+>
+> This app requires a GUI, and does not work on headless operating systems
+
+### Installation Troubleshooting
+
+**MacOS**
+
+For macOS, you might run into problems while opening the app, as it is not signed (it would require an Apple Developer account, which I do not have), and it might be deemed corrupted.
+
+In order to launch the app nevertheless, open the terminal and paste:
+
+```bash
+xattr -cr /Applications/photo-review.app
+```
+
+You will be prompted to approve the app to access you Mac's keychain, which is required to securely store your OpenAI API key.
+
+---
+
 ## Features
 
 - **Drag & drop** any image to analyze
