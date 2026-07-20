@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Review — Download</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    :root {
+      --sky: #38BDF2;
+      --gold: #F2C335;
+      --cream: #F2E6D8;
+      --orange: #F27B35;
+      --red: #F24738;
+      --dark: #1a1a1a;
+      --text: #2d2d2d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(160deg, var(--cream) 0%, #fff 50%, var(--sky) 200%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4rem 1.5rem;
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(56, 189, 242, 0.25);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+
+    .tagline {
+      font-size: 1.15rem;
+      color: #666;
+      margin-bottom: 3rem;
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.5;
+    }
+
+    .download-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+
+    .os-icon {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .os-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .os-detail {
+      font-size: 0.875rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange), var(--red));
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(242, 71, 56, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(242, 71, 56, 0.4);
+    }
+
+    .btn-primary.loading {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: #eee;
+    }
+
+    .all-platforms {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #eee;
+    }
+
+    .all-platforms h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+
+    .platform-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .platform-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      background: #fafafa;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+
+    .platform-row:hover {
+      background: #f0f0f0;
+    }
+
+    .platform-row .left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 500;
+    }
+
+    .platform-row .right {
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .version {
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+
+    .version a {
+      color: var(--sky);
+      text-decoration: none;
+    }
+
+    .version a:hover {
+      text-decoration: underline;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <img src="../src-tauri/icons/128x128.png" alt="Photo Review" class="logo">
+  <h1>Photo Review</h1>
+  <p class="tagline">AI-powered photography critique. Drop in an image and get detailed, structured feedback across 14 dimensions.</p>
+
+  <div class="download-card">
+    <!-- Auto-detected primary download -->
+    <div id="primary-download">
+      <div class="os-icon" id="os-icon">💻</div>
+      <div class="os-name" id="os-name">Detecting your OS...</div>
+      <div class="os-detail" id="os-detail"></div>
+      <a id="download-link" class="btn btn-primary" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+        <span>⬇</span> Download
+      </a>
+    </div>
+
+    <!-- All platforms fallback -->
+    <div class="all-platforms">
+      <h3>All Platforms</h3>
+      <div class="platform-grid">
+        <a class="platform-row" id="link-macos-arm" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+          <span class="left">🍎 macOS (Apple Silicon)</span>
+          <span class="right">.dmg</span>
+        </a>
+        <a class="platform-row" id="link-macos-intel" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+          <span class="left">🍎 macOS (Intel)</span>
+          <span class="right">.dmg</span>
+        </a>
+        <a class="platform-row" id="link-windows" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+          <span class="left">🪟 Windows</span>
+          <span class="right">.msi</span>
+        </a>
+        <a class="platform-row" id="link-linux-deb" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+          <span class="left">🐧 Linux (x64)</span>
+          <span class="right">.deb</span>
+        </a>
+        <a class="platform-row" id="link-linux-appimage" href="https://github.com/AstraBert/photo-review/releases/latest" target="_blank">
+          <span class="left">🐧 Linux (x64)</span>
+          <span class="right">.AppImage</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <p class="version">
+    Latest release on <a href="https://github.com/AstraBert/photo-review/releases" target="_blank">GitHub</a>
+  </p>
+
+  <script>
+    const REPO = 'AstraBert/photo-review';
+    const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
+
+    // Regex patterns to match asset filenames per platform/arch, based on the
+    // actual asset names Tauri produces (see releases page for reference).
+    const ASSET_PATTERNS = {
+      'macos-arm':       /_aarch64\.dmg$/i,
+      'macos-intel':     /_x64\.dmg$/i,
+      'windows':         /_x64_en-US\.msi$/i,
+      'linux-deb-x64':   /_amd64\.deb$/i,
+      'linux-deb-arm64': /_arm64\.deb$/i,
+      'linux-appimage-x64':   /_amd64\.AppImage$/i,
+      'linux-appimage-arm64': /_aarch64\.AppImage$/i,
+    };
+
+    const ua = navigator.userAgent;
+    const platform = navigator.platform;
+
+    let os = 'unknown';
+    let icon = '💻';
+    let name = 'Your Platform';
+    let detail = '';
+    let assetKey = '';
+
+    if (/Mac/.test(platform) || /Mac/.test(ua)) {
+      const isArm = /arm|aarch64/i.test(ua);
+      if (isArm) {
+        os = 'macos-arm';
+        name = 'macOS (Apple Silicon)';
+        detail = 'M1, M2, M3, or newer';
+        assetKey = 'macos-arm';
+      } else {
+        // Default to Apple Silicon for modern macOS since most are now ARM
+        os = 'macos-arm';
+        name = 'macOS (Apple Silicon)';
+        detail = 'M1, M2, M3, or newer';
+        assetKey = 'macos-arm';
+      }
+      icon = '🍎';
+    } else if (/Win/.test(platform) || /Win/.test(ua)) {
+      os = 'windows';
+      name = 'Windows';
+      detail = 'Windows 10 or later';
+      assetKey = 'windows';
+      icon = '🪟';
+    } else if (/Linux/.test(platform) || /Linux/.test(ua)) {
+      os = 'linux';
+      name = 'Linux';
+      detail = 'Debian/Ubuntu (.deb) shown — see all platforms for AppImage/RPM';
+      assetKey = 'linux-deb-x64';
+      icon = '🐧';
+    }
+
+    document.getElementById('os-icon').textContent = icon;
+    document.getElementById('os-name').textContent = name;
+    document.getElementById('os-detail').textContent = detail;
+
+    const rowIds = {
+      'macos-arm': 'link-macos-arm',
+      'macos-intel': 'link-macos-intel',
+      'windows': 'link-windows',
+      'linux-deb-x64': 'link-linux-deb',
+      'linux-appimage-x64': 'link-linux-appimage',
+    };
+
+    async function resolveLatestAssets() {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+          headers: { 'Accept': 'application/vnd.github+json' }
+        });
+        if (!res.ok) throw new Error(`GitHub API responded ${res.status}`);
+        const data = await res.json();
+        const assets = data.assets || [];
+
+        // Resolve and wire up every platform row
+        for (const [key, pattern] of Object.entries(ASSET_PATTERNS)) {
+          const match = assets.find(a => pattern.test(a.name));
+          if (match && rowIds[key]) {
+            document.getElementById(rowIds[key]).href = match.browser_download_url;
+          }
+        }
+
+        // Set the primary auto-detected download button
+        const primaryMatch = assets.find(a => ASSET_PATTERNS[assetKey]?.test(a.name));
+        const downloadLink = document.getElementById('download-link');
+        if (primaryMatch) {
+          downloadLink.href = primaryMatch.browser_download_url;
+        } else {
+          downloadLink.href = RELEASES_PAGE;
+        }
+      } catch (err) {
+        // Fall back to the releases page for everything if the API call fails
+        // (e.g. rate-limited or offline)
+        console.warn('Could not resolve latest release assets, falling back to releases page:', err);
+        document.getElementById('download-link').href = RELEASES_PAGE;
+      }
+    }
+
+    resolveLatestAssets();
+  </script>
+</body>
+</html>

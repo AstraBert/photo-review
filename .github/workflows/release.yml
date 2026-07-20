@@ -5,6 +5,11 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - README.md
+      - pages/**
+      - .github/workflows/**
+      - LICENSE
 
 jobs:
   publish-tauri:
