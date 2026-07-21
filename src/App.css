@@ -148,18 +148,39 @@ body {
   color: #1a1a1a;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .icon-btn {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s;
+  line-height: 1;
 }
 
 .icon-btn:hover {
   background: #f3f4f6;
+}
+
+.clear-btn {
+  font-size: 1.25rem;
+  color: #6b7280;
+}
+
+.clear-btn:hover {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.settings-btn {
+  color: #1a1a1a;
 }
 
 .settings-panel {
@@ -554,6 +575,19 @@ body {
 
   .icon-btn:hover {
     background: #374151;
+  }
+
+  .settings-btn {
+    color: #f3f4f6;
+  }
+
+  .clear-btn {
+    color: #9ca3af;
+  }
+
+  .clear-btn:hover {
+    color: #fca5a5;
+    background: #450a0a;
   }
 
   .upload-zone {

@@ -267,17 +267,24 @@ export default function App() {
     e.target.value = "";
   }
 
+  function clearImage() {
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl);
+    }
+    setImageUrl(null);
+    setImageSize(null);
+    setContainerSize(null);
+    setReview(null);
+    setError(null);
+    setActiveBbox(null);
+  }
+
   async function deleteKey() {
     try {
       await invoke("delete_api_key", { keyName: API_KEY_NAME });
-      if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-      }
+      clearImage();
       setApiKey(null);
       setShowSettings(false);
-      setImageUrl(null);
-      setImageSize(null);
-      setReview(null);
     } catch (err) {
       setError(String(err));
     }
@@ -301,13 +308,24 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Photo Review</h1>
-        <button
-          className="icon-btn"
-          onClick={() => setShowSettings((v) => !v)}
-          title="Settings"
-        >
-          ⚙
-        </button>
+        <div className="header-actions">
+          {imageUrl && (
+            <button
+              className="icon-btn clear-btn"
+              onClick={clearImage}
+              title="Clear image"
+            >
+              ✕
+            </button>
+          )}
+          <button
+            className="icon-btn settings-btn"
+            onClick={() => setShowSettings((v) => !v)}
+            title="Settings"
+          >
+            ⚙
+          </button>
+        </div>
       </header>
 
       {showSettings && (
