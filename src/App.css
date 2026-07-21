@@ -154,6 +154,36 @@ body {
   gap: 0.5rem;
 }
 
+.model-select {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  color: #1a1a1a;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.model-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.model-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.model-cost {
+  font-size: 0.75rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
 .icon-btn {
   background: none;
   border: none;
@@ -457,6 +487,30 @@ body {
   color: #92400e;
 }
 
+/* Costs */
+.costs-section {
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cost-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.cost-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
 /* Scores */
 .scores-list h3 {
   margin: 0 0 0.75rem;
@@ -662,6 +716,33 @@ body {
 
   .danger-btn:hover {
     background: #7f1d1d;
+  }
+
+  .model-select {
+    background: #111827;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .model-select:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+  }
+
+  .model-cost {
+    color: #9ca3af;
+  }
+
+  .costs-section {
+    border-top-color: #374151;
+  }
+
+  .cost-label {
+    color: #9ca3af;
+  }
+
+  .cost-value {
+    color: #f3f4f6;
   }
 
   .bbox.active {

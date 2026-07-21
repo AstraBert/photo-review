@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import type { PhotoReview, Bbox } from "./types";
+import type { PhotoReview, Bbox, ReviewWithUsage } from "./types";
 import "./App.css";
 
 const API_KEY_NAME = "openai";
@@ -21,6 +21,17 @@ const SCORE_FIELDS: { key: keyof PhotoReview; label: string }[] = [
   { key: "color_harmony", label: "Color Harmony" },
   { key: "post_processing", label: "Post-Processing" },
 ];
+
+/* OpenAI Models. Input and Output costs are in dollar, and are reported per million tokens */
+const OPENAI_MODELS: { value: string, displayName: string, inputCost: number, outputCost: number }[] = [
+  { value: "gpt-5.4-nano", displayName: "GPT 5.4 Nano", inputCost: 0.2, outputCost: 1.25 },
+  { value: "gpt-5.4-mini", displayName: "GPT 5.4 Mini", inputCost: 0.75, outputCost: 4.5 },
+  { value: "gpt-5.4", displayName: "GPT 5.4", inputCost: 2.5, outputCost: 15 },
+  { value: "gpt-5.5", displayName: "GPT 5.5", inputCost: 5, outputCost: 30 },
+  { value: "gpt-5.6-luna", displayName: "GPT 5.6 Luna", inputCost: 1, outputCost: 6 },
+  { value: "gpt-5.6-terra", displayName: "GPT 5.6 Terra", inputCost: 2.5, outputCost: 15  },
+  { value: "gpt-5.6-sol", displayName: "GPT 5.6 Sol", inputCost: 5, outputCost: 30 },
+]
 
 function getScoreColor(score: number): string {
   if (score >= 80) return "#22c55e";
@@ -169,11 +180,15 @@ export default function App() {
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [containerSize, setContainerSize] = useState<{ width: number; height: number } | null>(null);
   const [review, setReview] = useState<PhotoReview | null>(null);
+  const [usage, setUsage] = useState<{ input_tokens: number; output_tokens: number } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [activeBbox, setActiveBbox] = useState<number | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string>(OPENAI_MODELS[0].value);
+
+  const selectedModelInfo = OPENAI_MODELS.find((m) => m.value === selectedModel);
   const imgContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -213,6 +228,7 @@ export default function App() {
     }
     setError(null);
     setReview(null);
+    setUsage(null);
     setActiveBbox(null);
 
     if (imageUrl) {
@@ -233,11 +249,13 @@ export default function App() {
     setLoading(true);
     try {
       const bytes = await fileToBytes(file);
-      const result = await invoke<PhotoReview>("review_picture", {
+      const result = await invoke<ReviewWithUsage>("review_picture", {
         picture: bytes,
         apiKey,
+        model: selectedModel,
       });
-      setReview(result);
+      setReview(result.review);
+      setUsage({ input_tokens: result.input_tokens, output_tokens: result.output_tokens });
     } catch (err) {
       setError(String(err));
     } finally {
@@ -275,6 +293,7 @@ export default function App() {
     setImageSize(null);
     setContainerSize(null);
     setReview(null);
+    setUsage(null);
     setError(null);
     setActiveBbox(null);
   }
@@ -309,6 +328,25 @@ export default function App() {
       <header className="app-header">
         <h1>Photo Review</h1>
         <div className="header-actions">
+          <div className="model-select-wrapper">
+            <select
+              className="model-select"
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              title="Select AI model"
+            >
+              {OPENAI_MODELS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.displayName}
+                </option>
+              ))}
+            </select>
+            {selectedModelInfo && (
+              <span className="model-cost">
+                ${selectedModelInfo.inputCost} (request cost) / ${selectedModelInfo.outputCost} (response cost) per 1M tokens
+              </span>
+            )}
+          </div>
           {imageUrl && (
             <button
               className="icon-btn clear-btn"
@@ -438,6 +476,21 @@ export default function App() {
                 );
               })}
             </div>
+
+            {usage && selectedModelInfo && (
+              <div className="costs-section">
+                <div className="cost-row">
+                  <span className="cost-label">Estimated cost</span>
+                  <span className="cost-value">
+                    ${(
+                      (usage.input_tokens * selectedModelInfo.inputCost +
+                        usage.output_tokens * selectedModelInfo.outputCost) /
+                      1_000_000
+                    ).toFixed(4)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

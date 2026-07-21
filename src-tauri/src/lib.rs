@@ -1,3 +1,5 @@
+use std::{fmt::Display, str::FromStr};
+
 use keyring::Entry;
 use llms_sdk::{ApiType, ImagePart, LLMRequest, Message, MessagePart, MessageRole, TextPart, LLM};
 use schemars::JsonSchema;
@@ -19,7 +21,53 @@ Bounding boxes:
 - Coordinates (x, y, width, height) are in pixels, relative to the image's actual width and height. The origin (0, 0) is the top-left corner. x increases left to right; y increases top to bottom.
 - Each bbox's text should be a short, actionable note tied to that specific region.
 "#;
-const LLM_MODEL: &str = "gpt-5.4-mini";
+
+#[derive(Debug, Clone, Copy)]
+enum SupportedGptModel {
+    Gpt54nano,
+    Gpt54mini,
+    Gpt54,
+    Gpt55,
+    Gpt56Luna,
+    Gpt56Terra,
+    Gpt56Sol,
+}
+
+impl FromStr for SupportedGptModel {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "gpt-5.4-nano" => Ok(Self::Gpt54nano),
+            "gpt-5.4-mini" => Ok(Self::Gpt54mini),
+            "gpt-5.4" => Ok(Self::Gpt54),
+            "gpt-5.5" => Ok(Self::Gpt55),
+            "gpt-5.6-luna" => Ok(Self::Gpt56Luna),
+            "gpt-5.6-terra" => Ok(Self::Gpt56Terra),
+            "gpt-5.6-sol" => Ok(Self::Gpt56Sol),
+            _ => Err(format!("Unsupported model: {}", s)),
+        }
+    }
+}
+
+impl Display for SupportedGptModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Gpt54nano => write!(f, "gpt-5.4-nano"),
+            Self::Gpt54mini => write!(f, "gpt-5.4-mini"),
+            Self::Gpt54 => write!(f, "gpt-5.4"),
+            Self::Gpt55 => write!(f, "gpt-5.5"),
+            Self::Gpt56Luna => write!(f, "gpt-5.6-luna"),
+            Self::Gpt56Terra => write!(f, "gpt-5.6-terra"),
+            Self::Gpt56Sol => write!(f, "gpt-5.6-sol"),
+        }
+    }
+}
+
+fn validate_model(model: &str) -> Result<String, String> {
+    let supported_model = SupportedGptModel::from_str(model)?;
+    Ok(supported_model.to_string())
+}
 
 #[tauri::command]
 fn save_api_key(key_name: String, api_key: String) -> Result<(), String> {
@@ -122,18 +170,30 @@ pub struct PhotoReview {
     pub post_processing: ScoreAndExplanation,
 
     /// bboxes (a maximum of 5)
-    bboxes: Vec<Bbox>,
+    pub bboxes: Vec<Bbox>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReviewWithUsage {
+    pub review: PhotoReview,
+    pub input_tokens: u32,
+    pub output_tokens: u32,
 }
 
 #[tauri::command]
-async fn review_picture(picture: Vec<u8>, api_key: String) -> Result<PhotoReview, String> {
+async fn review_picture(
+    picture: Vec<u8>,
+    api_key: String,
+    model: String,
+) -> Result<ReviewWithUsage, String> {
     let llm = LLM::default();
+    let validated_model = validate_model(&model)?;
     let size = imagesize::blob_size(&picture).map_err(|e| e.to_string())?;
     let request = LLMRequest::builder()
         .api_type(ApiType::OpenAI)
         .api_key(api_key)
         .max_output_tokens(10_000)
-        .model(LLM_MODEL)
+        .model(validated_model)
         .output_format::<PhotoReview>("photo_review", "Schema representing the review of a photograph")
         .messages(vec![
             Message {
@@ -156,8 +216,13 @@ async fn review_picture(picture: Vec<u8>, api_key: String) -> Result<PhotoReview
             MessagePart::Text(t) => {
                 let review: PhotoReview =
                     serde_json::from_str(&t.text).map_err(|e| e.to_string())?;
+                let usage = response.usage;
 
-                return Ok(review);
+                return Ok(ReviewWithUsage {
+                    review,
+                    input_tokens: usage.input_tokens,
+                    output_tokens: usage.output_tokens,
+                });
             }
             _ => continue,
         }

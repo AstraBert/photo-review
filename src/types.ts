@@ -29,3 +29,9 @@ export interface PhotoReview {
   post_processing: ScoreAndExplanation;
   bboxes: Bbox[];
 }
+
+export interface ReviewWithUsage {
+  review: PhotoReview,
+  input_tokens: number,
+  output_tokens: number
+}
